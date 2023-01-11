@@ -1,16 +1,16 @@
-// Enter the team manager's name, employee ID, email address, and office number
+// Enter the team manager’s name, employee ID, email address, and office number
 // Menu to add engineer/intern/or finish building team
-// Select engineer: I am prompted to enter the engineer's name, ID, email, and GitHub username,
+// Select engineer: I am prompted to enter the engineer’s name, ID, email, and GitHub username,
 // I am taken back to the menu
-// Select intern: enter the intern's name, ID, email, and school,
+// Select intern: enter the intern’s name, ID, email, and school,
 // Select Finish
 // Generate HTML File
 const inquirer = require("inquirer");
-const fs = require("fs");
-const team = [];
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
+const fs = require("fs");
+const team = [];
 
 // Create Manager
 function createManager() {
@@ -80,9 +80,10 @@ function createEngineer() {
     .then((answers) => {
       console.log(answers);
       // Create a new Manager Object from the manager class.
-      const engineer = new Engineer(answers.engineerName, answers.engineerID, answers.engineerEmail, answers.engineerNumber);
+      const engineer = new Engineer(answers.engineerName, answers.engineerID, answers.engineerEmail, answers.engineerGithub);
       // Push engineer on to team array.
       team.push(engineer);
+      // Push engineer on to team array.
       createTeam();
     });
 }
@@ -120,6 +121,7 @@ function createIntern() {
       const intern = new Intern(answers.internName, answers.internID, answers.internEmail, answers.internSchool);
       // Push intern on to team array.
       team.push(intern);
+      // Push intern on to team array.
       createTeam();
     });
 }
@@ -134,7 +136,6 @@ function createTeam() {
       },
     ])
     .then((answers) => {
-      console.log(answers);
       if (answers.mainMenu === "Engineer") {
         createEngineer();
       } else if (answers.mainMenu === "Intern") {
@@ -150,36 +151,39 @@ function createTeam() {
 // Generate HTML
 const generateHTML = (team) => {
   const managerTemplate = `<div class="manager-card">
-  <div>${team[0].getName()} </div>
-  <div>${team[0].getId()} </div>
-  <div>${team[0].getEmail()} </div>
-  <div>${team[0].getOfficeNumber()} </div>
-  </div>`;
+<h3 class= "employee-name">${team[0].getName()} </h3>
+<h4 class="title">Manager</h4>
+<div>ID: ${team[0].getId()} </div>
+<div>Email: <a href="mailto:${team[0].getEmail()}">${team[0].getEmail()}</a></div>
+<div>Office Number: ${team[0].getOfficeNumber()} </div> 
+</div>`;
 
   const engineers = team.filter((employee) => employee.getRole() === "Engineer");
-  console.log(engineers);
 
   let engineerTemplate = "";
+
   engineers.forEach((engineer) => {
-    engineerTemplate += `<div class="engineer-card">
-    <div>${engineer.getName()} </div>
-    <div>${engineer.getId()} </div>
-    <div>${engineer.getEmail()} </div>
-    <div> <a href="https://github.com/${engineer.getGithub()}" target="_blank">${engineer.getGithub()}</a></div>
-    </div>`;
+    engineerTemplate += `<div class="engineer-card"> 
+<h3 class= "employee-name">${engineer.getName()} </h3>
+<h4 class="title">Engineer</h4>
+<div>ID: ${engineer.getId()} </div>
+<div>Email: <a href="mailto:${engineer.getEmail()}">${engineer.getEmail()}</a></div>
+<div>Github: <a href="https://github.com/${engineer.getGithub()}" target="_blank"> ${engineer.getGithub()} </a> </div>
+</div>`;
   });
 
   const interns = team.filter((employee) => employee.getRole() === "Intern");
-  console.log(interns);
 
   let internTemplate = "";
+
   interns.forEach((intern) => {
-    internTemplate += `<div class="intern-card">
-    <div>${intern.getName()} </div>
-    <div>${intern.getId()} </div>
-    <div>${intern.getEmail()} </div>
-    <div>${intern.getSchool()} </div>
-    </div>`;
+    internTemplate += `<div class="intern-card"> 
+<h3 class= "employee-name">${intern.getName()} </h3>
+<h4 class="title">Intern</h4>
+<div>ID: <a href="mailto:${intern.getId()}">${intern.getId()}</a></div>
+<div>Email: ${intern.getEmail()} </div>
+<div>School: ${intern.getSchool()} </div>
+</div>`;
   });
 
   const document = `<!DOCTYPE html>
@@ -188,12 +192,16 @@ const generateHTML = (team) => {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Team Profile Builder</title>
 </head>
 <body>
+<h1 class="heading"> Team Profile </h1>
 ${managerTemplate}
+<div class="employee-wrapper">
 ${engineerTemplate}
 ${internTemplate}
+</div>
 </body>
 </html>`;
   return document;
